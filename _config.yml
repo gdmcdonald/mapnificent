@@ -1,9 +1,9 @@
-baseurl: ""
+baseurl: "https://gdmcdonald.github.io/mapnificent/"
 tileUrl: "//cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"
 defaults:
   -
     scope:
-      path: ""
+      path: "/mapnificent"
       type: "cities"
     values:
       layout: "city"
