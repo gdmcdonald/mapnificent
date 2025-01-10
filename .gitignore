@@ -1,4 +1,4 @@
-static/vendor/
+_site/
 .bundle/
 vendor/
 node_modules/
