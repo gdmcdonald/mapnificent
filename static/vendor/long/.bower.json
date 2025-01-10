@@ -1,0 +1,14 @@
+{
+  "name": "long",
+  "homepage": "https://github.com/dcodeIO/Long.js",
+  "version": "5.2.4",
+  "_release": "5.2.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "v5.2.4",
+    "commit": "d5ab8f6ce5f20fe9edcb9d2fc38e8dad39d50469"
+  },
+  "_source": "https://github.com/dcodeIO/Long.js.git",
+  "_target": "*",
+  "_originalSource": "long"
+}
