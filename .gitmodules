@@ -1,4 +1,4 @@
 [submodule "_cities"]
 	path = _cities
 	url = https://github.com/gdmcdonald/mapnificent_cities.git
-	branch = master
+	branch = patch-1
