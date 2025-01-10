@@ -3,7 +3,7 @@ tileUrl: "//cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png
 defaults:
   -
     scope:
-      path: "/mapnificent"
+      path: ""
       type: "cities"
     values:
       layout: "city"
@@ -20,4 +20,4 @@ plugins:
 
 # Ignore our `vendor` folder from Bundler
 # https://github.com/jekyll/jekyll/issues/5267#issuecomment-241379902
-exclude: [vendor, _cities/**/scripts, __cities, _cities/**/data, node_modules, src, dist]
+exclude: [_cities/**/scripts, __cities, _cities/**/data]
