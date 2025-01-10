@@ -3,3 +3,4 @@ static/vendor/
 .bundle/
 vendor/
 node_modules/
+.DS_Store
