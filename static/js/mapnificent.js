@@ -536,24 +536,36 @@ Mapnificent.prototype.drawTile = function() {
 
     var stationsAround = self.quadtree.searchInRadius(latlng.lat, latlng.lng, searchRadius);
 
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = 'rgba(50,50,50,0.4)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    //ctx.globalCompositeOperation = 'source-over';
+    //ctx.fillStyle = 'rgba(50,50,50,0.4)';
+    //ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.fillStyle = 'rgba(0,0,0,1)';
+    ctx.globalCompositeOperation = 'xor';
+    //ctx.fillStyle = 'rgba(50,50,50,.5)';
 
     for (var i = 0; i < self.positions.length; i += 1) {
       var drawStations = self.positions[i].getReachableStations(stationsAround, start, tileSize);
+      ctx.fillStyle = generateColor(i); // Assign unique color based on index
       for (var j = 0; j < drawStations.length; j += 1) {
+        //ctx.strokeStyle = "red";
         ctx.beginPath();
+        
         ctx.arc(drawStations[j].x, drawStations[j].y,
-                drawStations[j].r, 0, 2 * Math.PI, false);
+                drawStations[j].r, 0, 2 * Math.PI, true);
+        //ctx.stroke();
+        //ctx.fillStyle = 'red';
         ctx.fill();
       }
     }
   };
 };
+
+function generateColor(index) {
+  const hue = (index * 137.508) % 360; // Spread colors evenly using the golden ratio
+  const saturation = 70 + (index % 2) * 10; // Alternate between 70% and 80% saturation
+  const lightness = 50 + (index % 3) * 10; // Alternate between 50%, 60%, and 70% lightness
+  return `hsla(${hue}, ${saturation}%, ${lightness}%, 0.3)`; // Add transparency
+}
 
 Mapnificent.prototype.augmentLeafletHash = function() {
   var mapnificent = this;
