@@ -506,56 +506,47 @@ Mapnificent.prototype.triggerHashUpdate = function() {
 
 Mapnificent.prototype.drawTile = function() {
   var self = this;
-
   var maxWalkTime = this.settings.maxWalkTime;
   var secondsPerKm = this.settings.secondsPerKm;
 
   return function(canvas, tilePoint) {
-    if (!self.stationList || !self.positions.length) {
-      return;
-    }
+    if (!self.stationList || !self.positions.length) return;
     var ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    /* Figure out how many stations we have to look at around
-       this tile.
-    */
-
-    var tileSize = this.options.tileSize;
-    var start = tilePoint.multiplyBy(tileSize);
-    var end = start.add([tileSize, 0]);
+    // Compute tile-to-world conversions
+    var tileSize    = this.options.tileSize;
+    var start       = tilePoint.multiplyBy(tileSize);
+    var end         = start.add([tileSize, 0]);
     var startLatLng = this._map.unproject(start);
-    var endLatLng = this._map.unproject(end);
-    var spanInMeters = startLatLng.distanceTo(endLatLng);
-    var maxWalkDistance = maxWalkTime * (1 / secondsPerKm) * 1000;
-    var middle = start.add([tileSize / 2, tileSize / 2]);
-    var latlng = this._map.unproject(middle);
+    var endLatLng   = this._map.unproject(end);
+    var spanMeters  = startLatLng.distanceTo(endLatLng);
+    var maxWalkDist = maxWalkTime * (1 / secondsPerKm) * 1000;
+    var middle      = start.add([tileSize/2, tileSize/2]);
+    var centerLL    = this._map.unproject(middle);
+    var searchRad   = Math.sqrt(2) * spanMeters + maxWalkDist;
 
-    var searchRadius = Math.sqrt(spanInMeters * spanInMeters + spanInMeters * spanInMeters);
-    searchRadius += maxWalkDistance;
+    // Find all reachable stations in this tile
+    var stationsAround = self.quadtree.searchInRadius(
+      centerLL.lat, centerLL.lng, searchRad
+    );
 
-    var stationsAround = self.quadtree.searchInRadius(latlng.lat, latlng.lng, searchRadius);
+    // For each starting location, union its circles then fill once
+    for (var i = 0; i < self.positions.length; i++) {
+      var path = new Path2D();
+      var drawStations = self.positions[i]
+                             .getReachableStations(stationsAround, start, tileSize);
 
-    //ctx.globalCompositeOperation = 'source-over';
-    //ctx.fillStyle = 'rgba(50,50,50,0.4)';
-    //ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.globalCompositeOperation = 'xor';
-    //ctx.fillStyle = 'rgba(50,50,50,.5)';
-
-    for (var i = 0; i < self.positions.length; i += 1) {
-      var drawStations = self.positions[i].getReachableStations(stationsAround, start, tileSize);
-      ctx.fillStyle = generateColor(i); // Assign unique color based on index
-      for (var j = 0; j < drawStations.length; j += 1) {
-        //ctx.strokeStyle = "red";
-        ctx.beginPath();
-        
-        ctx.arc(drawStations[j].x, drawStations[j].y,
-                drawStations[j].r, 0, 2 * Math.PI, true);
-        //ctx.stroke();
-        //ctx.fillStyle = 'red';
-        ctx.fill();
+      // Add each station’s circle to the Path2D
+      for (var j = 0; j < drawStations.length; j++) {
+        var s = drawStations[j];
+        path.moveTo(s.x + s.r, s.y);
+        path.arc(s.x, s.y, s.r, 0, 2 * Math.PI);
       }
+
+      // Fill the union of all those circles exactly once
+      ctx.fillStyle = generateColor(i);
+      ctx.fill(path);
     }
   };
 };
